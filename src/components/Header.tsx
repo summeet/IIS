@@ -26,9 +26,9 @@ type HeaderProps = {
 }
 
 function Header({
-  pageTitle,
-  theme,
-  onToggleTheme,
+  pageTitle: _pageTitle,
+  theme: _theme,
+  onToggleTheme: _onToggleTheme,
   onLogoClick,
   fullWidthContent = false,
   user,
