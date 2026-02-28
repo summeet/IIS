@@ -34,6 +34,9 @@ function Header({
   user,
   children,
 }: HeaderProps) {
+  void _pageTitle
+  void _theme
+  void _onToggleTheme
   const displayName =
     user?.name ?? user?.username ?? user?.email ?? 'Profile'
 
