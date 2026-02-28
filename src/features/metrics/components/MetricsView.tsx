@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import type { FighterData, UploadResult } from '../../upload/types'
+import type { FighterCorner, FighterData, UploadResult } from '../../upload/types'
 
 type MetricsViewProps = {
   metrics: UploadResult
@@ -25,7 +25,11 @@ function FighterStats({
   if (!data) {
     return null
   }
-  const corner = data.corner ?? {}
+  const corner: FighterCorner = data.corner ?? {
+    corner_name: null,
+    trunk_color_detected: null,
+    confidence_score: null,
+  }
   const cornerLabel = [corner.corner_name, corner.trunk_color_detected]
     .filter(Boolean)
     .join(' · ') || '—'

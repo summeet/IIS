@@ -34,7 +34,7 @@ export function mapHistoryReportToUploadResult(report: UserHistoryReport): Uploa
   const dateLabel = formatReportDate(report?.created_at ?? '')
   const sport = report?.sport ?? 'Session'
   const fileName = `${sport} – ${dateLabel}`
-  const performance = report?.performance ?? {}
+  const performance = (report?.performance ?? {}) as UserHistoryReport['performance']
   const fighter_A = performance?.fighter_A ?? null
   const fighter_B = performance?.fighter_B ?? null
   return {
