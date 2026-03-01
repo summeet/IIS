@@ -1247,18 +1247,33 @@
   margin: 0 auto;
 }
 
+/* Login/Register form on light hero background: ensure dark text on light card */
+.login-hero .login-panel.sport-panel {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
 .login-form-title {
   margin: 0;
   font-size: 1.95rem;
   letter-spacing: -0.04em;
-  color: #f9fafb;
+  color: #0f172a;
+}
+
+.login-hero .login-panel .login-form-title {
+  color: #0f172a;
 }
 
 .login-form-subtitle {
   margin-top: 0.55rem;
   margin-bottom: 0;
   font-size: 0.95rem;
-  color: #e5e7eb;
+  color: #475569;
+}
+
+.login-hero .login-panel .login-form-subtitle {
+  color: #475569;
 }
 
 .login-primary-button {
@@ -1268,19 +1283,37 @@
 }
 
 .login-panel .field span {
-  color: #e5e7eb;
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.15rem;
+}
+
+.login-hero .login-panel .field span {
+  color: #334155;
 }
 
 .login-panel input[type='email'],
-.login-panel input[type='password'] {
-  background-color: rgba(15, 23, 42, 0.9);
-  border-color: rgba(148, 163, 184, 0.9);
-  color: #f9fafb;
+.login-panel input[type='password'],
+.login-panel input[type='text'] {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.login-hero .login-panel input[type='email'],
+.login-hero .login-panel input[type='password'],
+.login-hero .login-panel input[type='text'] {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
 .login-panel input[type='email']::placeholder,
-.login-panel input[type='password']::placeholder {
-  color: #9ca3af;
+.login-panel input[type='password']::placeholder,
+.login-panel input[type='text']::placeholder {
+  color: #64748b;
 }
 
 .sport-hero {
@@ -1698,6 +1731,31 @@ input[type='password']:focus {
   justify-content: center;
 }
 
+/* Login / Register panel: "Already have an account?" / "Don't have an account?" link */
+.login-panel .login-secondary-link.ghost-button {
+  color: #475569;
+  border-color: #cbd5e1;
+  background-color: #f1f5f9;
+}
+
+.login-hero .login-panel .login-secondary-link.ghost-button {
+  color: #334155;
+  border-color: #cbd5e1;
+  background-color: #f1f5f9;
+}
+
+.login-panel .login-secondary-link.ghost-button:hover {
+  color: #ffffff;
+  border-color: #0ea5e9;
+  background-color: #0ea5e9;
+}
+
+.login-hero .login-panel .login-secondary-link.ghost-button:hover {
+  color: #ffffff;
+  border-color: #0284c7;
+  background-color: #0284c7;
+}
+
 .password-field {
   position: relative;
   display: flex;
@@ -1747,8 +1805,9 @@ input[type='password']:focus {
 }
 
 .ghost-button:hover {
-  background-color: #eff6ff;
-  color: #FFF
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #0ea5e9;
 }
 
 .error {

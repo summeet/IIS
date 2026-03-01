@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import Login from './features/auth/components/Login'
 import Register from './features/auth/components/Register'
@@ -14,8 +14,19 @@ import DashboardHome from './components/DashboardHome'
 
 function AppRoutes() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { isAuthenticated, logout, isLoggingOut } = useAuth()
   const [theme, setTheme] = useState<'dark' | 'light'>('light')
+
+  // Handle 401 from API: redirect to login via client-side nav (avoids server 404 on /login)
+  useEffect(() => {
+    const handleRedirect = async () => {
+      await logout()
+      navigate('/login', { replace: true })
+    }
+    window.addEventListener('auth:redirectToLogin', handleRedirect)
+    return () => window.removeEventListener('auth:redirectToLogin', handleRedirect)
+  }, [navigate, logout])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

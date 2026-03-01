@@ -24,13 +24,17 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use((response) => {
   return response
 }, (error) => {
-  if(error.response.status === 401) {
+  if (error?.response?.status === 401) {
     window.localStorage.removeItem('token')
     window.localStorage.removeItem('uploadReports')
     window.localStorage.removeItem('user')
-    window.localStorage.removeItem('theme')
+    window.localStorage.removeItem('authUser')
+    window.sessionStorage.removeItem('accessToken')
+    window.sessionStorage.removeItem('refreshToken')
+    window.sessionStorage.removeItem('authUser')
     window.sessionStorage.removeItem('isAuthenticated')
-    window.location.href = '/login'
+    // Use client-side redirect so deployed SPA doesn't request /login from server (404)
+    window.dispatchEvent(new CustomEvent('auth:redirectToLogin'))
   }
   return Promise.reject(error)
 })
