@@ -325,6 +325,7 @@
 }
 
 .dashboard-nav-item--logout {
+  gap: 0.5rem;
   color: #f87171;
 }
 
@@ -1168,7 +1169,7 @@
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  padding: 2.4rem 2.2rem 2.6rem;
+  padding: 2.4rem 2.2rem 2.6rem 4.5rem;
   max-width: 30rem;
 }
 
@@ -1178,13 +1179,13 @@
   height: auto;
   max-height: 48px;
   object-fit: contain;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
 .login-tagline {
   margin: 0;
-  font-size: 11px;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -1192,15 +1193,15 @@
 }
 
 .login-heading {
-  margin: 0.9rem 0 0;
-  font-size: 2.1rem;
+  margin: 0.35rem 0 0;
+  font-size: 2.6rem;
   letter-spacing: -0.04em;
   color: #f9fafb;
 }
 
 .login-copy {
   margin-top: 0.75rem;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   color: #e5e7eb;
 }
 
@@ -1217,7 +1218,7 @@
 
 .login-stat-number {
   display: block;
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #e5e7eb;
 }
@@ -1225,7 +1226,7 @@
 .login-stat-label {
   display: block;
   margin-top: 0.15rem;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #cbd5f5;
@@ -1771,14 +1772,14 @@ input[type='password']:focus {
 .password-toggle {
   position: absolute;
   right: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: #6b7280;
   cursor: pointer;
-  padding: 0;
+  padding: 0.25rem;
 }
 
 .password-toggle:hover {
