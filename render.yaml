@@ -1,0 +1,2 @@
+# Render static site - configure SPA fallback in Dashboard:
+# Redirects → Add rule → Source: /*  Destination: /index.html  Type: Rewrite
