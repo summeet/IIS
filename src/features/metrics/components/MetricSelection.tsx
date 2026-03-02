@@ -1,8 +1,10 @@
+import { ArrowLeft } from 'lucide-react'
 import type { SportKey } from '../../sports/components/SportSelection'
 
 type MetricSelectionProps = {
   sport: SportKey
   onSelectMetric: (metricKey: string) => void
+  onBack?: () => void
   theme: 'dark' | 'light'
 }
 
@@ -61,6 +63,7 @@ function getSportLabel(sport: SportKey): string {
 function MetricSelection({
   sport,
   onSelectMetric,
+  onBack,
   theme,
 }: MetricSelectionProps) {
   const metrics = METRICS_BY_SPORT[sport]
@@ -70,6 +73,16 @@ function MetricSelection({
     <div className="app-page metric-selection-page bg-white py-10">
       <div className="metric-selection-content">
         <header className="metric-selection-header">
+          {onBack && (
+            <button
+              type="button"
+              className="metric-selection-back-link"
+              onClick={onBack}
+            >
+              <ArrowLeft size={18} strokeWidth={2} aria-hidden />
+              <span>Back</span>
+            </button>
+          )}
           <p className="text-[11px] font-semibold tracking-[0.25em] text-sky-200 uppercase">
             Performance metric
           </p>

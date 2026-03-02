@@ -1,14 +1,15 @@
 import { useState, useRef } from 'react'
-import { Upload, FileVideo, X, Loader2 } from 'lucide-react'
+import { ArrowLeft, Upload, FileVideo, X, Loader2 } from 'lucide-react'
 import { useToast } from '../../../contexts/ToastContext'
 import type { UploadVideoResponse } from '../types'
 import { uploadVideo } from '../api'
 
 type VideoUploadProps = {
   onAnalyzed: (result: UploadVideoResponse, file: File) => void
+  onBack?: () => void
 }
 
-function VideoUpload({ onAnalyzed }: VideoUploadProps) {
+function VideoUpload({ onAnalyzed, onBack }: VideoUploadProps) {
   const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -101,6 +102,16 @@ function VideoUpload({ onAnalyzed }: VideoUploadProps) {
     <div className="app-page video-upload-page bg-white py-10">
       <div className="upload-content">
         <header className="upload-header">
+          {onBack && (
+            <button
+              type="button"
+              className="upload-back-link"
+              onClick={onBack}
+            >
+              <ArrowLeft size={18} strokeWidth={2} aria-hidden />
+              <span>Back</span>
+            </button>
+          )}
           <p className="text-[11px] font-semibold tracking-[0.25em] text-sky-200 uppercase">
             Upload video
           </p>

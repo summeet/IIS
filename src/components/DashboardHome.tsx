@@ -28,12 +28,18 @@ export default function DashboardHome() {
       <MetricSelection
         sport={sport}
         onSelectMetric={setMetricKey}
+        onBack={() => setSport(null)}
         theme={theme}
       />
     )
   }
   if (view === 'upload') {
-    return <VideoUpload onAnalyzed={handleAnalyzed} />
+    return (
+      <VideoUpload
+        onAnalyzed={handleAnalyzed}
+        onBack={() => setMetricKey(null)}
+      />
+    )
   }
   if (metrics) {
     return (
