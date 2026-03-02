@@ -72,6 +72,7 @@ type DashboardProviderProps = {
   renderLayout: (props: {
     pageTitle: string
     onLogoClick: () => void
+    onHistoryClick: () => void
     children: React.ReactNode
   }) => React.ReactNode
 }
@@ -172,6 +173,11 @@ export function DashboardProvider({
     navigate('/dashboard')
   }, [navigate])
 
+  const onHistoryClick = useCallback(() => {
+    setHistoryViewingReport(null)
+    navigate('/history')
+  }, [navigate])
+
   const pageTitle = getPageTitle(
     location.pathname,
     sport,
@@ -206,6 +212,7 @@ export function DashboardProvider({
       {renderLayout({
         pageTitle,
         onLogoClick,
+        onHistoryClick,
         children,
       })}
     </DashboardContext.Provider>

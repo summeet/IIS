@@ -4,9 +4,11 @@ type SidebarLayoutProps = {
   children: React.ReactNode
   onLogout?: () => void
   isLoggingOut?: boolean
+  onHomeClick?: () => void
+  onHistoryClick?: () => void
 }
 
-function SidebarLayout({ children, onLogout, isLoggingOut = false }: SidebarLayoutProps) {
+function SidebarLayout({ children, onLogout, isLoggingOut = false, onHomeClick, onHistoryClick }: SidebarLayoutProps) {
   return (
     <div className="dashboard-layout">
       <aside className="dashboard-sidebar">
@@ -16,6 +18,7 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false }: SidebarLayo
             className={({ isActive }) =>
               `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
             }
+            onClick={onHomeClick}
           >
             Home
           </NavLink>
@@ -24,6 +27,7 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false }: SidebarLayo
             className={({ isActive }) =>
               `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
             }
+            onClick={onHistoryClick}
           >
             History
           </NavLink>

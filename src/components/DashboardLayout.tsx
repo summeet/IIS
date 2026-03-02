@@ -44,7 +44,7 @@ export function DashboardLayout({
   return (
     <DashboardProvider
       theme={theme}
-      renderLayout={({ pageTitle, onLogoClick, children }) => (
+      renderLayout={({ pageTitle, onLogoClick, onHistoryClick, children }) => (
         <Header
           pageTitle={pageTitle}
           theme={theme}
@@ -56,6 +56,8 @@ export function DashboardLayout({
           <SidebarLayout
             onLogout={onLogout}
             isLoggingOut={isLoggingOut}
+            onHomeClick={onLogoClick}
+            onHistoryClick={onHistoryClick}
           >
             {children}
           </SidebarLayout>
