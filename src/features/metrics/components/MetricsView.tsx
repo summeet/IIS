@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
+import { normalizeFighterPair } from '../../upload/api'
 import type { FighterCorner, FighterData, UploadResult } from '../../upload/types'
 
 type MetricsViewProps = {
@@ -83,9 +84,19 @@ function MetricsView({
   onBackToList,
 }: MetricsViewProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const { response: analysis, fileName } = metrics
+  const { response: rawResponse, fileName } = metrics
+
+  /** Normalize response so we handle both API shapes: array [{ fighter_A }, { fighter_B }] or object { fighter_A, fighter_B } */
+  const analysis = useMemo(() => {
+    const pair = normalizeFighterPair(rawResponse)
+    return {
+      fighter_A: pair.fighter_A,
+      fighter_B: pair.fighter_B,
+    }
+  }, [rawResponse])
+
   const hasFighters =
-    analysis?.fighter_A != null && analysis?.fighter_B != null
+    analysis.fighter_A != null && analysis.fighter_B != null
 
   useEffect(() => {
     if (!file) {
@@ -142,8 +153,8 @@ function MetricsView({
             <h3 className="metrics-section-title">Performance analysis</h3>
             {hasFighters ? (
               <div className="metrics-fighters">
-                <FighterStats label="Fighter A" data={analysis?.fighter_A} />
-                <FighterStats label="Fighter B" data={analysis?.fighter_B} />
+                <FighterStats label="Fighter A" data={analysis.fighter_A} />
+                <FighterStats label="Fighter B" data={analysis.fighter_B} />
               </div>
             ) : (
               <p className="metrics-no-video">
@@ -153,10 +164,7 @@ function MetricsView({
           </section>
         </div>
         <div className="metrics-view-actions">
-          {onBackToList ? (
-            < >
-            </>
-          ) : (
+          {onBackToList ? null : (
             <>
               <button
                 type="button"

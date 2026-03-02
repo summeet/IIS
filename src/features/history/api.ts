@@ -1,15 +1,15 @@
 import apiClient from '../../api/client'
 import type { FighterData, UploadResult } from '../upload/types'
+import { normalizeFighterPair } from '../upload/api'
 
-/** Single report from GET /dash/user-id result array */
+/** Single report from GET /dash/user-id – performance may be array or object */
 export type UserHistoryReport = {
   _id: string
   user_id: string
   sport: string
-  performance: {
-    fighter_A: FighterData
-    fighter_B: FighterData
-  }
+  performance?:
+    | { fighter_A: FighterData; fighter_B: FighterData }
+    | Array<{ fighter_A?: FighterData } | { fighter_B?: FighterData }>
   created_at: string
   updated_at: string
 }
@@ -29,26 +29,35 @@ export async function getUserHistory(): Promise<UserHistoryReport[]> {
   return Array.isArray(list) ? list : []
 }
 
-/** Map API report to UploadResult for History/MetricsView */
+const emptyFighter: FighterData = {
+  corner: { corner_name: null, trunk_color_detected: null, confidence_score: null },
+  total_punches: null,
+  landed: null,
+  accuracy: null,
+  jabs: null,
+  hooks: null,
+  ring_control: null,
+  distance_covered: null,
+  blocks: null,
+}
+
+/** Map API report to UploadResult for History/MetricsView; normalizes performance if array */
 export function mapHistoryReportToUploadResult(report: UserHistoryReport): UploadResult {
   const dateLabel = formatReportDate(report?.created_at ?? '')
   const sport = report?.sport ?? 'Session'
   const fileName = `${sport} – ${dateLabel}`
-  const performance = (report?.performance ?? {}) as UserHistoryReport['performance']
-  const fighter_A = performance?.fighter_A ?? null
-  const fighter_B = performance?.fighter_B ?? null
+  const pair = normalizeFighterPair(report?.performance)
+  const fighter_A = pair.fighter_A ?? emptyFighter
+  const fighter_B = pair.fighter_B ?? emptyFighter
   return {
     message: '',
     user_id: report?.user_id ?? '',
-    response: {
-      fighter_A: fighter_A as import('../upload/types').FighterData,
-      fighter_B: fighter_B as import('../upload/types').FighterData,
-    },
+    response: { fighter_A, fighter_B },
     report: {
       _id: report?._id ?? '',
       user_id: report?.user_id ?? '',
       sport: report?.sport ?? '',
-      performance: report?.performance ?? { fighter_A: null, fighter_B: null },
+      performance: { fighter_A, fighter_B },
       created_at: report?.created_at ?? '',
       updated_at: report?.updated_at ?? '',
     },
