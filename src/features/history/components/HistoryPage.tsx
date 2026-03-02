@@ -1,4 +1,5 @@
-import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { Eye, Loader2, Trash2 } from 'lucide-react'
 import type { UploadResult } from '../../upload/types'
 import MetricsView from '../../metrics/components/MetricsView'
 
@@ -8,6 +9,7 @@ type HistoryPageProps = {
   viewingReport: UploadResult | null
   onSelectReport: (report: UploadResult) => void
   onBackToList: () => void
+  onDeleteReport?: (reportId: string) => void | Promise<void>
 }
 
 function formatDate(iso: string) {
@@ -24,7 +26,23 @@ function formatDate(iso: string) {
   }
 }
 
-function HistoryPage({ history, historyLoading = false, viewingReport, onSelectReport, onBackToList }: HistoryPageProps) {
+function HistoryPage({ history, historyLoading = false, viewingReport, onSelectReport, onBackToList, onDeleteReport }: HistoryPageProps) {
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+
+  const handleDelete = async (reportId: string) => {
+    if (!onDeleteReport) return
+    setDeletingIds((prev) => new Set(prev).add(reportId))
+    try {
+      await Promise.resolve(onDeleteReport(reportId))
+    } finally {
+      setDeletingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(reportId)
+        return next
+      })
+    }
+  }
+
   if (viewingReport) {
     return (
       <MetricsView
@@ -71,13 +89,31 @@ function HistoryPage({ history, historyLoading = false, viewingReport, onSelectR
                       {report.report.sport && ` · ${report.report.sport}`}
                     </span>
                   </div>
-                  <button
+                  <div className="history-page-item-actions">
+                    <button
                       type="button"
-                      className="secondary-button history-page-view-btn"
+                      className="history-page-view-btn"
                       onClick={() => onSelectReport(report)}
+                      aria-label={`View ${report.fileName}`}
                     >
-                      View
+                      <Eye size={18} strokeWidth={2} aria-hidden />
                     </button>
+                    {onDeleteReport && (
+                      <button
+                        type="button"
+                        className="history-page-delete-btn"
+                        onClick={() => handleDelete(report.report._id)}
+                        disabled={deletingIds.has(report.report._id)}
+                        aria-label={`Delete ${report.fileName}`}
+                      >
+                        {deletingIds.has(report.report._id) ? (
+                          <Loader2 size={18} strokeWidth={2} className="animate-spin" aria-hidden />
+                        ) : (
+                          <Trash2 size={18} strokeWidth={2} aria-hidden />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </li>
             ))}
           </ul>

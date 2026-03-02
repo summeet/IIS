@@ -20,6 +20,7 @@ export function HistoryPageWithContext() {
     historyViewingReport,
     setHistoryViewingReport,
     handleSelectFromHistory,
+    handleDeleteReport,
   } = useDashboard()
   return (
     <HistoryPage
@@ -28,6 +29,7 @@ export function HistoryPageWithContext() {
       viewingReport={historyViewingReport}
       onSelectReport={handleSelectFromHistory}
       onBackToList={() => setHistoryViewingReport(null)}
+      onDeleteReport={handleDeleteReport}
     />
   )
 }

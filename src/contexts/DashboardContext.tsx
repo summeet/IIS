@@ -13,9 +13,11 @@ import type {
   UploadVideoResponse,
 } from '../features/upload/types'
 import {
+  deleteReports,
   getUserHistory,
   mapHistoryReportToUploadResult,
 } from '../features/history/api'
+import { useToast } from './ToastContext'
 
 export type View = 'upload' | 'metrics'
 
@@ -37,6 +39,7 @@ type DashboardContextValue = {
   theme: 'dark' | 'light'
   handleAnalyzed: (result: UploadVideoResponse, file: File) => void
   handleSelectFromHistory: (item: UploadResult) => void
+  handleDeleteReport: (reportId: string) => Promise<void>
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null)
@@ -80,6 +83,7 @@ export function DashboardProvider({
 }: DashboardProviderProps) {
   const navigate = useNavigate()
   const location = useLocation()
+  const toast = useToast()
   const [sport, setSport] = useState<SportKey | null>(null)
   const [metricKey, setMetricKey] = useState<string | null>(null)
   const [view, setView] = useState<View>('upload')
@@ -146,6 +150,20 @@ export function DashboardProvider({
     }
   }, [navigate, location.pathname])
 
+  const handleDeleteReport = useCallback(
+    async (reportId: string) => {
+      try {
+        await deleteReports([reportId])
+        setHistory((prev) => prev.filter((r) => r.report._id !== reportId))
+        setHistoryViewingReport((prev) => (prev?.report._id === reportId ? null : prev))
+        toast.success('Report deleted')
+      } catch {
+        toast.error('Failed to delete report')
+      }
+    },
+    [toast],
+  )
+
   const onLogoClick = useCallback(() => {
     setSport(null)
     setMetricKey(null)
@@ -180,6 +198,7 @@ export function DashboardProvider({
     theme,
     handleAnalyzed,
     handleSelectFromHistory,
+    handleDeleteReport,
   }
 
   return (

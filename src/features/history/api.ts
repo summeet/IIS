@@ -29,6 +29,12 @@ export async function getUserHistory(): Promise<UserHistoryReport[]> {
   return Array.isArray(list) ? list : []
 }
 
+/** Delete reports by IDs. Body: string[] */
+export async function deleteReports(reportIds: string[]): Promise<void> {
+  if (reportIds.length === 0) return
+  await apiClient.post('/dash/delete-reports', reportIds)
+}
+
 const emptyFighter: FighterData = {
   corner: { corner_name: null, trunk_color_detected: null, confidence_score: null },
   total_punches: null,
