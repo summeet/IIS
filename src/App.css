@@ -533,7 +533,7 @@
   width: 100%;
   max-width: 1024px;
   margin: 0;
-  padding: 0 0 0 2rem;
+  padding: 0 2rem 0 2rem;
 }
 
 .sport-selection-header {
@@ -581,7 +581,7 @@
   width: 100%;
   max-width: 1024px;
   margin: 0;
-  padding: 0 0 0 2rem;
+  padding: 0 2rem 0 2rem;
 }
 
 .metric-selection-header {
@@ -685,7 +685,7 @@
   width: 100%;
   max-width: 1024px;
   margin: 0;
-  padding: 0 0 0 2rem;
+  padding: 0 2rem 0 2rem;
 }
 
 .upload-header {
