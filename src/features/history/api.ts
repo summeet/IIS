@@ -7,6 +7,7 @@ export type UserHistoryReport = {
   _id: string
   user_id: string
   sport: string
+  name?: string
   performance?:
     | { fighter_A: FighterData; fighter_B: FighterData }
     | Array<{ fighter_A?: FighterData } | { fighter_B?: FighterData }>
@@ -41,7 +42,7 @@ const emptyFighter: FighterData = {}
 export function mapHistoryReportToUploadResult(report: UserHistoryReport): UploadResult {
   const dateLabel = formatReportDate(report?.created_at ?? '')
   const sport = report?.sport ?? 'Session'
-  const fileName = `${sport} – ${dateLabel}`
+  const fileName = `${report?.name ? `${report?.name} -` : ''}  ${sport} – ${dateLabel}`
   const pair = normalizeFighterPair(report?.performance)
   const fighter_A = pair.fighter_A ?? emptyFighter
   const fighter_B = pair.fighter_B ?? emptyFighter
@@ -53,6 +54,7 @@ export function mapHistoryReportToUploadResult(report: UserHistoryReport): Uploa
       _id: report?._id ?? '',
       user_id: report?.user_id ?? '',
       sport: report?.sport ?? '',
+      name: report?.name,
       performance: { fighter_A, fighter_B },
       created_at: report?.created_at ?? '',
       updated_at: report?.updated_at ?? '',

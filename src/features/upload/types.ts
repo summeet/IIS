@@ -35,6 +35,7 @@ export type UploadVideoResponse = {
     _id: string
     user_id: string
     sport: string
+    name?: string
     performance: Record<string, FighterData>
     created_at: string
     updated_at: string

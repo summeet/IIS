@@ -1233,6 +1233,16 @@
   margin-top: 0;
 }
 
+.metric-configuration-edit.metric-configuration-edit-fields {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.metric-configuration-edit.metric-configuration-edit-fields .metric-config-input-inline {
+  flex: none;
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .metric-configuration-edit {
     flex-direction: column;

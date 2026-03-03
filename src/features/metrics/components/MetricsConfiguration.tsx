@@ -34,6 +34,8 @@ function MetricsConfiguration() {
   const [editingKey, setEditingKey] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [newKey, setNewKey] = useState('')
+  const [newDescription, setNewDescription] = useState('')
+  const [editKey, setEditKey] = useState('')
   const [editDesc, setEditDesc] = useState('')
 
   const loadMatrices = useCallback(async () => {
@@ -73,19 +75,21 @@ function MetricsConfiguration() {
     }
     setLoading(true)
     try {
+      const description = newDescription.trim()
       if (matrixDoc) {
         await updateMatrix(matrixDoc._id, {
           sport,
-          matrix: { ...matrixDoc.matrix, [newKey.trim()]: "" },
+          matrix: { ...matrixDoc.matrix, [newKey.trim()]: description },
         })
       } else {
         await createMatrix({
           sport,
-          matrix: { [newKey.trim()]: "" },
+          matrix: { [newKey.trim()]: description },
         })
       }
       toast.success('Metric added')
       setNewKey('')
+      setNewDescription('')
       setIsAdding(false)
       loadMatrices()
     } catch (err) {
@@ -94,18 +98,27 @@ function MetricsConfiguration() {
     }
   }
 
-  const handleUpdate = async (key: string) => {
-    if (!matrixDoc || !sport) return
+  const handleUpdate = async () => {
+    if (!matrixDoc || !sport || !editingKey) return
+    const newKeyTrim = editKey.trim()
+    if (!newKeyTrim) {
+      toast.error('Metric key is required')
+      return
+    }
     setLoading(true)
     setEditingKey(null)
     try {
-      const updated = { ...matrixDoc.matrix, [key]: editDesc.trim() || key }
+      const updated: MatrixRecord = { ...matrixDoc.matrix }
+      delete updated[editingKey]
+      updated[newKeyTrim] = editDesc.trim() || newKeyTrim
       await updateMatrix(matrixDoc._id, { sport, matrix: updated })
       toast.success('Metric updated')
+      setEditKey('')
       setEditDesc('')
       loadMatrices()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to update metric')
+      setEditingKey(editingKey)
     } finally {
       setLoading(false)
     }
@@ -132,12 +145,16 @@ function MetricsConfiguration() {
   }
 
   const startEdit = (key: string, desc: string) => {
+    const value = matrixDoc?.matrix?.[key]
+    const description = typeof value === 'string' ? value : (typeof desc === 'string' ? desc : '')
     setEditingKey(key)
-    setEditDesc(desc)
+    setEditKey(key)
+    setEditDesc(description)
   }
 
   const cancelEdit = () => {
     setEditingKey(null)
+    setEditKey('')
     setEditDesc('')
   }
 
@@ -206,6 +223,7 @@ function MetricsConfiguration() {
                   if (!loading) {
                     setIsAdding(false)
                     setNewKey('')
+                    setNewDescription('')
                   }
                 }}
                 role="dialog"
@@ -230,6 +248,7 @@ function MetricsConfiguration() {
                         if (!loading) {
                           setIsAdding(false)
                           setNewKey('')
+                          setNewDescription('')
                         }
                       }}
                       aria-label="Close"
@@ -237,12 +256,21 @@ function MetricsConfiguration() {
                       <X size={20} strokeWidth={2} />
                     </button>
                   </div>
-                  <div className="mb-5">
+                  <div className="mb-4">
                     <input
                       type="text"
                       placeholder="Metric key (e.g. punchSpeed)"
                       value={newKey}
                       onChange={(e) => setNewKey(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-900 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <input
+                      type="text"
+                      placeholder="Description (optional)"
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
                       className="w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-900 placeholder:text-slate-500 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                     />
                   </div>
@@ -253,6 +281,7 @@ function MetricsConfiguration() {
                       onClick={() => {
                         setIsAdding(false)
                         setNewKey('')
+                        setNewDescription('')
                       }}
                     >
                       Cancel
@@ -286,14 +315,21 @@ function MetricsConfiguration() {
                 matrixEntries.map(([key, desc]) => (
                   <li key={key} className="metric-configuration-item">
                     {editingKey === key ? (
-                      <div className="metric-configuration-edit">
+                      <div className="metric-configuration-edit metric-configuration-edit-fields">
+                        <input
+                          type="text"
+                          value={editKey}
+                          onChange={(e) => setEditKey(e.target.value)}
+                          placeholder="Metric key"
+                          className="metric-config-input metric-config-input-inline"
+                          autoFocus
+                        />
                         <input
                           type="text"
                           value={editDesc}
                           onChange={(e) => setEditDesc(e.target.value)}
-                          placeholder="Description"
+                          placeholder="Description (optional)"
                           className="metric-config-input metric-config-input-inline"
-                          autoFocus
                         />
                         <div className="metric-configuration-item-actions">
                           <button
@@ -306,7 +342,7 @@ function MetricsConfiguration() {
                           <button
                             type="button"
                             className="primary-button metric-config-btn-sm"
-                            onClick={() => handleUpdate(key)}
+                            onClick={handleUpdate}
                             disabled={loading}
                           >
                             Save
