@@ -82,17 +82,16 @@ function HistoryPage({ history, historyLoading = false, viewingReport, onSelectR
                 <li key={report.report._id} className="history-page-item">
                   <div className="history-page-item-text">
                     <span className="history-page-file metric-file-name">
-                      {report.fileName}
+                      {report.report.name ||
+                        `${report.report.sport || 'Session'} – ${formatDate(report.report.created_at)}`}
                     </span>
-                    <span className="history-page-meta">
-                      {[
-                        report.report.name,
-                        report.report.sport,
-                        formatDate(report.report.created_at),
-                      ]
-                        .filter(Boolean)
-                        .join(' – ')}
-                    </span>
+                    {report.report.name && (
+                      <span className="history-page-meta">
+                        {[report.report.sport, formatDate(report.report.created_at)]
+                          .filter(Boolean)
+                          .join(' – ')}
+                      </span>
+                    )}
                   </div>
                   <div className="history-page-item-actions">
                     <button
