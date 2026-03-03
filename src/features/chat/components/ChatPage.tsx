@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send } from 'lucide-react'
+import apiClient from '../../../api/client'
 
 type Message = {
   id: string
@@ -11,8 +12,11 @@ type Message = {
 const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const sessionIdRef = useRef<string>(`session_${crypto.randomUUID()}`)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -22,21 +26,70 @@ const ChatPage = () => {
     scrollToBottom()
   }, [messages])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const text = input.trim()
-    if (!text) return
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        role: 'user',
-        content: text,
-        timestamp: new Date(),
-      },
-    ])
+    if (!text || isSending) return
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: text,
+      timestamp: new Date(),
+    }
+
+    setMessages((prev) => [...prev, userMessage])
     setInput('')
-    inputRef.current?.focus()
+    setError(null)
+    setIsSending(true)
+
+    try {
+      const response = await apiClient.post<{
+        message?: string
+        reply?: string
+        response?: string
+        content?: string
+      }>('/chatbot/chat', {
+        message: text,
+        model: 'llama-3.3-70b-versatile',
+        api_key: import.meta.env.VITE_CHAT_API_KEY,
+        google_api_key: import.meta.env.VITE_GOOGLE_API_KEY,
+        session_id: sessionIdRef.current,
+      })
+
+      const data = response.data as {
+        message?: string
+        reply?: string
+        response?: string
+        content?: string
+      }
+
+      const replyText =
+        data.reply ??
+        data.response ??
+        data.message ??
+        data.content ??
+        ''
+
+      if (replyText) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: replyText,
+            timestamp: new Date(),
+          },
+        ])
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Chat send failed', err)
+      setError('Failed to send message. Please try again.')
+    } finally {
+      setIsSending(false)
+      inputRef.current?.focus()
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -57,9 +110,15 @@ const ChatPage = () => {
             Message
           </h2>
           <p className="mt-1 text-sm text-slate-200/90 max-w-xl">
-            Send a message. Connect a backend to enable replies.
+            Send a message to the assistant. Your session stays within this browser tab.
           </p>
         </header>
+
+        {error && (
+          <p className="chat-messages-empty-hint" role="alert">
+            {error}
+          </p>
+        )}
 
         <div className="chat-panel">
           <div className="chat-messages">
@@ -103,7 +162,7 @@ const ChatPage = () => {
             <button
               type="submit"
               className="primary-button chat-send-btn"
-              disabled={!input.trim()}
+              disabled={!input.trim() || isSending}
               aria-label="Send message"
             >
               <Send size={20} strokeWidth={2} aria-hidden />
