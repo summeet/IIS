@@ -7,9 +7,11 @@ import { uploadVideo } from '../api'
 type VideoUploadProps = {
   onAnalyzed: (result: UploadVideoResponse, file: File) => void
   onBack?: () => void
+  sport?: string
+  metricKey?: string
 }
 
-function VideoUpload({ onAnalyzed, onBack }: VideoUploadProps) {
+function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps) {
   const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -74,14 +76,26 @@ function VideoUpload({ onAnalyzed, onBack }: VideoUploadProps) {
     setIsUploading(true)
 
     try {
-      const result = await uploadVideo(file, () => {})
+      const result = await uploadVideo(file, () => {}, {
+        sport: sport ?? undefined,
+        metric_key: metricKey ?? undefined,
+      })
       onAnalyzed(result, file)
       toast.success('Video uploaded successfully')
     } catch (uploadError) {
-      const message =
-        uploadError && typeof uploadError === 'object' && 'response' in uploadError
-          ? (uploadError as { response?: { data?: { detail?: string } } }).response?.data?.detail
-          : null
+      let message: string | null = null
+      if (uploadError && typeof uploadError === 'object' && 'response' in uploadError) {
+        const res = (uploadError as { response?: { data?: unknown } }).response
+        const detail = res?.data && typeof res.data === 'object' && 'detail' in res.data ? (res.data as { detail: unknown }).detail : null
+        if (Array.isArray(detail) && detail.length > 0) {
+          const first = detail[0]
+          const msg = first && typeof first === 'object' && 'msg' in first ? String((first as { msg: string }).msg) : null
+          const loc = first && typeof first === 'object' && 'loc' in first ? (first as { loc: unknown }).loc : null
+          message = msg && Array.isArray(loc) ? `${msg} (${loc.join('.')})` : msg ?? JSON.stringify(detail)
+        } else if (typeof detail === 'string') {
+          message = detail
+        }
+      }
       setError(
         message ||
           (uploadError instanceof Error

@@ -22,7 +22,7 @@ export type UserHistoryResponse = {
 }
 
 export async function getUserHistory(): Promise<UserHistoryReport[]> {
-  const response = await apiClient.get<UserHistoryResponse | UserHistoryReport[]>('/dash/user-id')
+  const response = await apiClient.get<UserHistoryResponse | UserHistoryReport[]>('/reports')
   const data = response.data
   if (Array.isArray(data)) return data
   const list = data?.result ?? data?.reports ?? data?.data ?? []
@@ -32,7 +32,7 @@ export async function getUserHistory(): Promise<UserHistoryReport[]> {
 /** Delete reports by IDs. Body: string[] */
 export async function deleteReports(reportIds: string[]): Promise<void> {
   if (reportIds.length === 0) return
-  await apiClient.post('/dash/delete-reports', reportIds)
+  await apiClient.delete('reports', { data: reportIds as unknown as string[] })
 }
 
 const emptyFighter: FighterData = {

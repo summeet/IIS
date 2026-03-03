@@ -1,6 +1,12 @@
 import apiClient from '../../api/client'
 import type { FighterData, UploadVideoResponse } from './types'
 
+/** Video upload endpoint – update if backend path changed */
+const UPLOAD_VIDEO_ENDPOINT = '/video/upload'
+
+/** FormData field name for the video file – use 'file' or 'video' per backend */
+const UPLOAD_VIDEO_FILE_FIELD = 'video'
+
 /** API may return response/performance as array [{ fighter_A }, { fighter_B }]; normalize to object */
 export function normalizeFighterPair(
   value: unknown,
@@ -42,6 +48,9 @@ const emptyFighter: FighterData = {
 export function normalizeUploadVideoResponse(
   data: Record<string, unknown>,
 ): UploadVideoResponse {
+  if (!data || typeof data !== 'object') {
+    data = {}
+  }
   const responseNorm = normalizeFighterPair(data?.response)
   const report = (data?.report ?? {}) as Record<string, unknown>
   const performanceNorm = normalizeFighterPair(report?.performance)
@@ -69,12 +78,20 @@ export function normalizeUploadVideoResponse(
 export async function uploadVideo(
   file: File,
   onProgress?: (percent: number) => void,
+  payload?: { sport?: string; metric_key?: string },
 ): Promise<UploadVideoResponse> {
   const formData = new FormData()
-  formData.append('video', file)
+  formData.append('name', file.name)
+  formData.append(UPLOAD_VIDEO_FILE_FIELD, file)
+  if (payload?.sport != null && payload.sport !== '') {
+    formData.append('sport', payload.sport)
+  }
+  if (payload?.metric_key != null && payload.metric_key !== '') {
+    formData.append('metric_key', payload.metric_key)
+  }
 
   const response = await apiClient.post<Record<string, unknown>>(
-    '/dash/upload-video',
+    UPLOAD_VIDEO_ENDPOINT,
     formData,
     {
       onUploadProgress: (event) => {
