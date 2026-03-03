@@ -23,7 +23,16 @@ export default function DashboardHome() {
   if (sport === null) {
     return <SportSelection onSelect={setSport} />
   }
-  
+  if (metricKey === null) {
+    return (
+      <MetricSelection
+        sport={sport}
+        onSelectMetric={setMetricKey}
+        onBack={() => setSport(null)}
+        theme={theme}
+      />
+    )
+  }
   if (view === 'upload') {
     return (
       <VideoUpload
