@@ -105,12 +105,18 @@ function MetricsConfiguration() {
       toast.error('Metric key is required')
       return
     }
+    const newDesc = editDesc.trim() || ''
     setLoading(true)
     setEditingKey(null)
     try {
-      const updated: MatrixRecord = { ...matrixDoc.matrix }
-      delete updated[editingKey]
-      updated[newKeyTrim] = editDesc.trim() || newKeyTrim
+      const updated: MatrixRecord = {}
+      for (const [k, v] of Object.entries(matrixDoc.matrix)) {
+        if (k === editingKey) {
+          updated[newKeyTrim] = newDesc
+        } else {
+          updated[k] = v
+        }
+      }
       await updateMatrix(matrixDoc._id, { sport, matrix: updated })
       toast.success('Metric updated')
       setEditKey('')
