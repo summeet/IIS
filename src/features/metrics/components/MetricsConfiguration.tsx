@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowLeft, Plus, Pencil, Trash2, Loader2, X } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Loader2, X } from 'lucide-react'
 import type { SportKey } from '../../sports/components/SportSelection'
 import SportSelection from '../../sports/components/SportSelection'
 import {
@@ -31,12 +31,9 @@ function MetricsConfiguration() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isAdding, setIsAdding] = useState(false)
-  const [editingKey, setEditingKey] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [newKey, setNewKey] = useState('')
   const [newDescription, setNewDescription] = useState('')
-  const [editKey, setEditKey] = useState('')
-  const [editDesc, setEditDesc] = useState('')
 
   const loadMatrices = useCallback(async () => {
     if (!sport) return
@@ -98,38 +95,6 @@ function MetricsConfiguration() {
     }
   }
 
-  const handleUpdate = async () => {
-    if (!matrixDoc || !sport || !editingKey) return
-    const newKeyTrim = editKey.trim()
-    if (!newKeyTrim) {
-      toast.error('Metric key is required')
-      return
-    }
-    const newDesc = editDesc.trim() || ''
-    setLoading(true)
-    setEditingKey(null)
-    try {
-      const updated: MatrixRecord = {}
-      for (const [k, v] of Object.entries(matrixDoc.matrix)) {
-        if (k === editingKey) {
-          updated[newKeyTrim] = newDesc
-        } else {
-          updated[k] = v
-        }
-      }
-      await updateMatrix(matrixDoc._id, { sport, matrix: updated })
-      toast.success('Metric updated')
-      setEditKey('')
-      setEditDesc('')
-      loadMatrices()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to update metric')
-      setEditingKey(editingKey)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleDelete = async (key: string) => {
     if (!matrixDoc || !sport) return
     setDeletingId(key)
@@ -150,22 +115,8 @@ function MetricsConfiguration() {
     }
   }
 
-  const startEdit = (key: string, desc: string) => {
-    const value = matrixDoc?.matrix?.[key]
-    const description = typeof value === 'string' ? value : (typeof desc === 'string' ? desc : '')
-    setEditingKey(key)
-    setEditKey(key)
-    setEditDesc(description)
-  }
-
-  const cancelEdit = () => {
-    setEditingKey(null)
-    setEditKey('')
-    setEditDesc('')
-  }
-
   if (sport === null) {
-    return <SportSelection onSelect={setSport} />
+    return <SportSelection onSelect={setSport} isFrom="Metrics configuration"/>
   }
 
   return (
@@ -177,7 +128,6 @@ function MetricsConfiguration() {
               type="button"
               className="metric-selection-back-link"
               onClick={() => {
-                cancelEdit()
                 setSport(null)
               }}
             >
@@ -203,7 +153,7 @@ function MetricsConfiguration() {
             Manage metrics for {getSportLabel(sport)}
           </h2>
           <p className="mt-1 text-sm text-slate-200/90 max-w-xl">
-            Add, edit, or remove performance metrics for this sport.
+            Add or remove performance metrics for this sport.
           </p>
         </header>
 
@@ -213,7 +163,6 @@ function MetricsConfiguration() {
               <li key={i} className="metric-configuration-item metric-configuration-skeleton-item">
                 <div className="metric-configuration-skeleton-line metric-configuration-skeleton-key" />
                 <div className="metric-configuration-skeleton-actions">
-                  <span className="metric-configuration-skeleton-line metric-configuration-skeleton-btn" />
                   <span className="metric-configuration-skeleton-line metric-configuration-skeleton-btn" />
                 </div>
               </li>
@@ -321,74 +270,29 @@ function MetricsConfiguration() {
                   No metrics yet. Add one above.
                 </li>
               ) : (
-                matrixEntries.map(([key, desc]) => (
+                matrixEntries.map(([key]) => (
                   <li key={key} className="metric-configuration-item">
-                    {editingKey === key ? (
-                      <div className="metric-configuration-edit metric-configuration-edit-fields">
-                        <input
-                          type="text"
-                          value={editKey}
-                          onChange={(e) => setEditKey(e.target.value)}
-                          placeholder="Metric key"
-                          className="metric-config-input metric-config-input-inline"
-                          autoFocus
-                        />
-                        <input
-                          type="text"
-                          value={editDesc}
-                          onChange={(e) => setEditDesc(e.target.value)}
-                          placeholder="Description (optional)"
-                          className="metric-config-input metric-config-input-inline"
-                        />
-                        <div className="metric-configuration-item-actions">
-                          <button
-                            type="button"
-                            className="secondary-button metric-config-btn-sm"
-                            onClick={cancelEdit}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            className="primary-button metric-config-btn-sm"
-                            onClick={handleUpdate}
-                            disabled={loading}
-                          >
-                            Save
-                          </button>
-                        </div>
+                    <>
+                      <div className="metric-configuration-item-text">
+                        <span className="metric-config-key">{key}</span>
+                        {/* <span className="metric-config-desc">{desc || '—'}</span> */}
                       </div>
-                    ) : (
-                      <>
-                        <div className="metric-configuration-item-text">
-                          <span className="metric-config-key">{key}</span>
-                          {/* <span className="metric-config-desc">{desc || '—'}</span> */}
-                        </div>
-                        <div className="metric-configuration-item-actions">
-                          <button
-                            type="button"
-                            className="metric-config-icon-btn"
-                            onClick={() => startEdit(key, desc)}
-                            aria-label={`Edit ${key}`}
-                          >
-                            <Pencil size={16} strokeWidth={2} />
-                          </button>
-                          <button
-                            type="button"
-                            className="metric-config-icon-btn metric-config-icon-btn--danger"
-                            onClick={() => handleDelete(key)}
-                            disabled={deletingId === key}
-                            aria-label={`Delete ${key}`}
-                          >
-                            {deletingId === key ? (
-                              <Loader2 size={16} strokeWidth={2} className="animate-spin" />
-                            ) : (
-                              <Trash2 size={16} strokeWidth={2} />
-                            )}
-                          </button>
-                        </div>
-                      </>
-                    )}
+                      <div className="metric-configuration-item-actions">
+                        <button
+                          type="button"
+                          className="metric-config-icon-btn metric-config-icon-btn--danger"
+                          onClick={() => handleDelete(key)}
+                          disabled={deletingId === key}
+                          aria-label={`Delete ${key}`}
+                        >
+                          {deletingId === key ? (
+                            <Loader2 size={16} strokeWidth={2} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={16} strokeWidth={2} />
+                          )}
+                        </button>
+                      </div>
+                    </>
                   </li>
                 ))
               )}

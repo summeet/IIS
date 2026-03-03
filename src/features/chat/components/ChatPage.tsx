@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Send } from 'lucide-react'
 import apiClient from '../../../api/client'
 
@@ -9,6 +9,28 @@ type Message = {
   timestamp: Date
 }
 
+const SUGGESTED_PROMPTS = [
+  'How can I improve my boxing punch speed?',
+  'What metrics should I track for wrestling performance?',
+  'Explain the key techniques for judo throws.',
+  'How do I analyse my swimming lap times?',
+  'What are the best drills for track and field?',
+  'How can I reduce injury risk in winter sports?',
+  'Suggest a training plan for better endurance.',
+  'What should I focus on in my next video analysis?',
+  'How do I compare my performance over time?',
+  'What does a good warm-up routine look like?',
+]
+
+function shuffle<T>(arr: T[]): T[] {
+  const out = [...arr]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
 const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -17,6 +39,11 @@ const ChatPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const sessionIdRef = useRef<string>(`session_${crypto.randomUUID()}`)
+
+  const suggestedPrompts = useMemo(
+    () => shuffle(SUGGESTED_PROMPTS).slice(0, 4),
+    [],
+  )
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -123,9 +150,23 @@ const ChatPage = () => {
         <div className="chat-panel">
           <div className="chat-messages">
             {messages.length === 0 ? (
-              <div className="chat-messages-empty">
-                <p>No messages yet.</p>
-                <p className="chat-messages-empty-hint">Type below and press Enter or Send.</p>
+              <div className="chat-messages-empty chat-suggestions">
+                <p className="chat-suggestions-title">What are you working on?</p>
+                <div className="chat-suggestions-list">
+                  {suggestedPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      className="chat-suggestion-chip"
+                      onClick={() => {
+                        setInput(prompt)
+                        inputRef.current?.focus()
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <>

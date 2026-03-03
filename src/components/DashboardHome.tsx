@@ -19,7 +19,7 @@ export default function DashboardHome() {
   } = useDashboard()
 
   if (sport === null) {
-    return <SportSelection onSelect={setSport} />
+    return <SportSelection onSelect={setSport} isFrom="Video analysis"/>
   }
   if (view === 'upload') {
     return (

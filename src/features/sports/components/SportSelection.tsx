@@ -12,6 +12,7 @@ import wrestlingImage from '../../../assets/wrestling-suplex.jpg'
 
 type SportSelectionProps = {
   onSelect: (sport: SportKey) => void
+  isFrom?: string
 }
 
 const SPORTS: { key: SportKey; label: string; image: string }[] = [
@@ -50,16 +51,16 @@ const SPORTS: { key: SportKey; label: string; image: string }[] = [
   },
 ]
 
-function SportSelection({ onSelect }: SportSelectionProps) {
+function SportSelection({ onSelect, isFrom }: SportSelectionProps) {
   return (
     <div className="app-page sport-selection-page bg-white py-10">
       <div className="sport-selection-content">
         <header className="sport-selection-header">
           <p className="text-[11px] font-semibold tracking-[0.25em] text-sky-200 uppercase">
-            Select sport
+            {isFrom}
           </p>
           <h2 className="mt-1.5 text-2xl md:text-3xl font-semibold tracking-tight text-white">
-            Choose an athlete discipline
+            Select sport
           </h2>
           <p className="mt-1 text-sm text-slate-200/90 max-w-xl">
             Pick the sport you want to analyse. We&apos;ll group your video
