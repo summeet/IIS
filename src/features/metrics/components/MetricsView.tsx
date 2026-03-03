@@ -16,6 +16,13 @@ function fmt(value: string | number | null | undefined, suffix = ''): string {
   return `${value}${suffix}`
 }
 
+/** Convert API key to display label (e.g. total_punches → Total punches) */
+function keyToLabel(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 function FighterStats({
   label,
   data,
@@ -23,54 +30,40 @@ function FighterStats({
   label: string
   data: FighterData | null | undefined
 }) {
-  if (!data) {
+  if (!data || typeof data !== 'object') {
     return null
   }
-  const corner: FighterCorner = data.corner ?? {
-    corner_name: null,
-    trunk_color_detected: null,
-    confidence_score: null,
-  }
-  const cornerLabel = [corner.corner_name, corner.trunk_color_detected]
-    .filter(Boolean)
-    .join(' · ') || '—'
+  const corner = data.corner && typeof data.corner === 'object' ? data.corner as FighterCorner : null
+  const cornerLabel = corner
+    ? [corner.corner_name, corner.trunk_color_detected].filter(Boolean).join(' · ') || '—'
+    : null
+
+  /** Display name: use data.name or data.label if present, else the passed label (e.g. Fighter A) */
+  const displayName =
+    (typeof data.name === 'string' && data.name.trim() !== '' ? data.name : null) ??
+    (typeof data.label === 'string' && data.label.trim() !== '' ? data.label : null) ??
+    label
+
+  /** Dynamic stat entries: all keys except corner, name, label; only primitive values */
+  const statEntries = Object.entries(data).filter(
+    ([key, value]) =>
+      key !== 'corner' && key !== 'name' && key !== 'label' &&
+      (value === null || value === undefined || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+  )
+
   return (
     <div className="fighter-card">
-      <h3 className="fighter-card-title">{label}</h3>
-      <p className="fighter-corner">{cornerLabel}</p>
+      <h3 className="fighter-card-title">{displayName}</h3>
+      {cornerLabel != null && cornerLabel !== '—' && (
+        <p className="fighter-corner">{cornerLabel}</p>
+      )}
       <dl className="fighter-stats">
-        <div>
-          <dt>Total punches</dt>
-          <dd>{fmt(data.total_punches)}</dd>
-        </div>
-        <div>
-          <dt>Landed</dt>
-          <dd>{fmt(data.landed)}</dd>
-        </div>
-        <div>
-          <dt>Accuracy</dt>
-          <dd>{fmt(data.accuracy, '%')}</dd>
-        </div>
-        <div>
-          <dt>Jabs</dt>
-          <dd>{fmt(data.jabs)}</dd>
-        </div>
-        <div>
-          <dt>Hooks</dt>
-          <dd>{fmt(data.hooks)}</dd>
-        </div>
-        <div>
-          <dt>Ring control</dt>
-          <dd>{fmt(data.ring_control, '%')}</dd>
-        </div>
-        <div>
-          <dt>Distance covered</dt>
-          <dd>{fmt(data.distance_covered, 'm')}</dd>
-        </div>
-        <div>
-          <dt>Blocks</dt>
-          <dd>{fmt(data.blocks)}</dd>
-        </div>
+        {statEntries.map(([key, value]) => (
+          <div key={key}>
+            <dt>{keyToLabel(key)}</dt>
+            <dd>{fmt(value as string | number | null | undefined)}</dd>
+          </div>
+        ))}
       </dl>
     </div>
   )

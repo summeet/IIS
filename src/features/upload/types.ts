@@ -11,23 +11,17 @@ export type VideoReport = VideoMetrics & {
   createdAt: string
 }
 
-/* Upload video API response (boxing analysis) – API may return null for any field */
+/* Upload video API response – API may return null for any field */
 export type FighterCorner = {
-  corner_name: string | null
-  trunk_color_detected: string | null
-  confidence_score: number | null
+  corner_name?: string | null
+  trunk_color_detected?: string | null
+  confidence_score?: number | null
 }
 
+/** Fighter/participant data – keys are dynamic from API (e.g. total_punches, custom metrics) */
 export type FighterData = {
-  corner: FighterCorner
-  total_punches: number | null
-  landed: number | null
-  accuracy: number | null
-  jabs: number | null
-  hooks: number | null
-  ring_control: number | null
-  distance_covered: number | null
-  blocks: number | null
+  corner?: FighterCorner | null
+  [key: string]: unknown
 }
 
 export type UploadVideoResponse = {

@@ -7,6 +7,9 @@ const UPLOAD_VIDEO_ENDPOINT = '/video/upload'
 /** FormData field name for the video file – use 'file' or 'video' per backend */
 const UPLOAD_VIDEO_FILE_FIELD = 'video'
 
+/** FormData key for the selected person name; value = person name string */
+const UPLOAD_PERSON_NAME_KEY = 'person_name'
+
 /** API may return response/performance as array [{ fighter_A }, { fighter_B }]; normalize to object */
 export function normalizeFighterPair(
   value: unknown,
@@ -32,17 +35,7 @@ export function normalizeFighterPair(
   return out
 }
 
-const emptyFighter: FighterData = {
-  corner: { corner_name: null, trunk_color_detected: null, confidence_score: null },
-  total_punches: null,
-  landed: null,
-  accuracy: null,
-  jabs: null,
-  hooks: null,
-  ring_control: null,
-  distance_covered: null,
-  blocks: null,
-}
+const emptyFighter: FighterData = {}
 
 /** Normalize upload API response so response/performance are always { fighter_A, fighter_B } */
 export function normalizeUploadVideoResponse(
@@ -78,16 +71,18 @@ export function normalizeUploadVideoResponse(
 export async function uploadVideo(
   file: File,
   onProgress?: (percent: number) => void,
-  payload?: { sport?: string; metric_key?: string },
+  payload?: { sport?: string; metric_key?: string; person_name?: string },
 ): Promise<UploadVideoResponse> {
   const formData = new FormData()
-  formData.append('name', file.name)
   formData.append(UPLOAD_VIDEO_FILE_FIELD, file)
   if (payload?.sport != null && payload.sport !== '') {
     formData.append('sport', payload.sport)
   }
   if (payload?.metric_key != null && payload.metric_key !== '') {
     formData.append('metric_key', payload.metric_key)
+  }
+  if (payload?.person_name != null && payload.person_name !== '') {
+    formData.append('name', payload.person_name)
   }
 
   const response = await apiClient.post<Record<string, unknown>>(

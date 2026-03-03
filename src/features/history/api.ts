@@ -35,17 +35,7 @@ export async function deleteReports(reportIds: string[]): Promise<void> {
   await apiClient.delete('reports', { data: reportIds as unknown as string[] })
 }
 
-const emptyFighter: FighterData = {
-  corner: { corner_name: null, trunk_color_detected: null, confidence_score: null },
-  total_punches: null,
-  landed: null,
-  accuracy: null,
-  jabs: null,
-  hooks: null,
-  ring_control: null,
-  distance_covered: null,
-  blocks: null,
-}
+const emptyFighter: FighterData = {}
 
 /** Map API report to UploadResult for History/MetricsView; normalizes performance if array */
 export function mapHistoryReportToUploadResult(report: UserHistoryReport): UploadResult {

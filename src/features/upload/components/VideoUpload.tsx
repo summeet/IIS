@@ -1,19 +1,26 @@
-import { useState, useRef } from 'react'
-import { ArrowLeft, Upload, FileVideo, X, Loader2 } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { ArrowLeft, Upload, FileVideo, X, Loader2, ChevronDown, Check } from 'lucide-react'
 import { useToast } from '../../../contexts/ToastContext'
 import type { UploadVideoResponse } from '../types'
 import { uploadVideo } from '../api'
+
+const DEFAULT_PERSON_OPTIONS = ['Person 1', 'Person 2', 'Person 3']
 
 type VideoUploadProps = {
   onAnalyzed: (result: UploadVideoResponse, file: File) => void
   onBack?: () => void
   sport?: string
   metricKey?: string
+  /** List of person names for the dropdown; user must select one before uploading */
+  personNames?: string[]
 }
 
-function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps) {
+function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAULT_PERSON_OPTIONS }: VideoUploadProps) {
   const toast = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [personName, setPersonName] = useState<string>('')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -66,7 +73,23 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
     if (inputRef.current) inputRef.current.value = ''
   }
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [dropdownOpen])
+
   const startUpload = async () => {
+    if (!personName.trim()) {
+      setError('Please select a person first.')
+      return
+    }
     if (!file) {
       setError('Please choose a video file to upload.')
       return
@@ -79,6 +102,7 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
       const result = await uploadVideo(file, () => {}, {
         sport: sport ?? undefined,
         metric_key: metricKey ?? undefined,
+        person_name: personName.trim(),
       })
       onAnalyzed(result, file)
       toast.success('Video uploaded successfully')
@@ -130,15 +154,69 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
             Upload video
           </p>
           <h2 className="mt-1.5 text-2xl md:text-3xl font-semibold tracking-tight text-white">
-            Upload your session footage
+            {personName
+              ? `Upload session footage for ${personName}`
+              : 'Upload your session footage'}
           </h2>
           <p className="mt-1 text-sm text-slate-200/90 max-w-xl">
-            Choose an athlete video for this session. We&apos;ll process it and
-            generate performance metrics based on your selected sport and focus.
+            {personName
+              ? `Choose a video for ${personName}. We'll process it and generate performance metrics based on your selected sport and focus.`
+              : 'Select a person above, then choose or drop a video. We\'ll process it and generate metrics based on your sport and focus.'}
           </p>
         </header>
 
         <div className="upload-body">
+          <div className="upload-field" ref={dropdownRef}>
+            <label className="upload-label">Person name</label>
+            <div className="custom-dropdown">
+              <button
+                type="button"
+                className={`custom-dropdown-trigger ${dropdownOpen ? 'custom-dropdown-trigger--open' : ''}`}
+                onClick={() => !isUploading && setDropdownOpen((o) => !o)}
+                disabled={isUploading}
+                aria-expanded={dropdownOpen}
+                aria-haspopup="listbox"
+                aria-label="Select person"
+                id="upload-person-name"
+              >
+                <span className={`custom-dropdown-value ${!personName ? 'custom-dropdown-value--placeholder' : ''}`}>
+                  {personName || 'Select person'}
+                </span>
+                <ChevronDown
+                  size={20}
+                  strokeWidth={2}
+                  className="custom-dropdown-chevron"
+                  aria-hidden
+                />
+              </button>
+              <div
+                className={`custom-dropdown-panel ${dropdownOpen ? 'custom-dropdown-panel--open' : ''}`}
+                role="listbox"
+                aria-labelledby="upload-person-name"
+              >
+                {personNames.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    role="option"
+                    aria-selected={personName === name}
+                    className={`custom-dropdown-option ${personName === name ? 'custom-dropdown-option--selected' : ''}`}
+                    onClick={() => {
+                      setPersonName(name)
+                      setError(null)
+                      setDropdownOpen(false)
+                    }}
+                  >
+                    <span>{name}</span>
+                    {personName === name && (
+                      <Check size={18} strokeWidth={2.5} className="custom-dropdown-check" aria-hidden />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <input
             ref={inputRef}
             type="file"
@@ -163,10 +241,16 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
                 <Upload size={40} strokeWidth={1.5} />
               </span>
               <span className="upload-zone-primary">
-                {isDragOver ? 'Drop video here' : 'Drop your video here'}
+                {isDragOver
+                  ? 'Drop video here'
+                  : personName
+                    ? `Drop ${personName}'s video here`
+                    : 'Drop your video here'}
               </span>
               <span className="upload-zone-secondary">
-                or click to browse from your device
+                {personName
+                  ? `or click to browse a video for ${personName}`
+                  : 'or click to browse from your device'}
               </span>
               <span className="upload-zone-hint">MP4, WebM, or other video files</span>
             </button>
@@ -205,7 +289,7 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
               type="button"
               className="upload-submit primary-button"
               onClick={startUpload}
-              disabled={isUploading}
+              disabled={isUploading || !personName.trim()}
             >
               {isUploading ? (
                 <>
@@ -217,8 +301,10 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey }: VideoUploadProps)
                   />
                   Uploading…
                 </>
+              ) : personName ? (
+                `Upload & generate for ${personName}`
               ) : (
-                'Upload & Generate'
+                'Upload & generate'
               )}
             </button>
           )}
