@@ -935,6 +935,17 @@
   background-color: rgba(56, 189, 248, 0.1);
 }
 
+.upload-processing-message {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.theme-light .upload-processing-message,
+.video-upload-page.bg-white .upload-processing-message {
+  color: #475569;
+}
+
 .theme-light .history-page-view-btn,
 .history-page.bg-white .history-page-view-btn {
   color: #64748b;

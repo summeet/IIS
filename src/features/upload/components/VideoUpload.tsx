@@ -17,6 +17,15 @@ const DEFAULT_PERSON_OPTIONS = [
   'Reese Thompson',
 ]
 
+const PROCESSING_MESSAGES = [
+  'We\'re processing your video…',
+  'Analyzing movement and technique…',
+  'Extracting performance metrics…',
+  'Evaluating tempo and intensity…',
+  'Highlighting key moments…',
+  'Almost there, finalizing your report…',
+]
+
 type VideoUploadProps = {
   onAnalyzed: (result: UploadVideoResponse, file: File) => void
   onBack?: () => void
@@ -36,6 +45,7 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAU
   const [isUploading, setIsUploading] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [processingStep, setProcessingStep] = useState(0)
 
   const handleFileChange = (selected: File | null): void => {
     setFile(selected)
@@ -77,6 +87,17 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAU
       setError('Please choose a video file (e.g. MP4, WebM).')
     }
   }
+
+  useEffect(() => {
+    if (!isUploading) {
+      setProcessingStep(0)
+      return
+    }
+    const interval = window.setInterval(() => {
+      setProcessingStep((prev) => (prev + 1) % PROCESSING_MESSAGES.length)
+    }, 5000)
+    return () => window.clearInterval(interval)
+  }, [isUploading])
 
   const clearFile = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -295,6 +316,12 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAU
             <div className="upload-error" role="alert">
               {error}
             </div>
+          )}
+
+          {isUploading && (
+            <p className="upload-processing-message">
+              {PROCESSING_MESSAGES[processingStep]}
+            </p>
           )}
 
           {file && (
