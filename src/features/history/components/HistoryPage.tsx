@@ -55,7 +55,7 @@ function HistoryPage({ history, historyLoading = false, viewingReport, onSelectR
 
   return (
     <div className="app-page history-page bg-white py-10">
-      <div className="history-page-content">
+      <div className="history-page-content !max-w-full">
         <header className="history-page-header">
           <p className="text-[11px] font-semibold tracking-[0.25em] text-sky-200 uppercase">
             History
@@ -68,9 +68,9 @@ function HistoryPage({ history, historyLoading = false, viewingReport, onSelectR
           </p>
         </header>
         {historyLoading ? (
-          <div className="history-page-loader">
-            <Loader2 size={32} strokeWidth={2} className="history-page-loader-icon" aria-hidden />
-            <span className="history-page-loader-text">Loading history…</span>
+          <div className="app-page-loader">
+            <Loader2 size={32} strokeWidth={2} className="app-page-loader-icon" aria-hidden />
+            <span className="app-page-loader-text">Loading history…</span>
           </div>
         ) : history.length === 0 ? (
           <p className="history-page-empty">

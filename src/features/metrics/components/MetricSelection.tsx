@@ -1,44 +1,13 @@
-import { ArrowLeft } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import type { SportKey } from '../../sports/components/SportSelection'
+import { getMatricesBySport, type MatrixDoc } from '../api/matrices'
 
 type MetricSelectionProps = {
   sport: SportKey
   onSelectMetric: (metricKey: string) => void
   onBack?: () => void
   theme: 'dark' | 'light'
-}
-
-const METRICS_BY_SPORT: Record<SportKey, { key: string; label: string }[]> = {
-  boxing: [
-    { key: 'punchSpeed', label: 'Punch speed' },
-    { key: 'punchAccuracy', label: 'Punch accuracy' },
-    { key: 'ringCoverage', label: 'Ring coverage' },
-  ],
-  judo: [
-    { key: 'throwEfficiency', label: 'Throw efficiency' },
-    { key: 'gripTime', label: 'Grip control time' },
-    { key: 'transitionSpeed', label: 'Transition speed' },
-  ],
-  swimming: [
-    { key: 'lapTime', label: 'Average lap time' },
-    { key: 'strokeRate', label: 'Stroke rate' },
-    { key: 'turnEfficiency', label: 'Turn efficiency' },
-  ],
-  trackField: [
-    { key: 'splitTime', label: 'Split times' },
-    { key: 'strideLength', label: 'Stride length' },
-    { key: 'acceleration', label: 'Acceleration phases' },
-  ],
-  wrestling: [
-    { key: 'takedownSuccess', label: 'Takedown success rate' },
-    { key: 'controlTime', label: 'Control time' },
-    { key: 'escapeSpeed', label: 'Escape speed' },
-  ],
-  winterSports: [
-    { key: 'speed', label: 'Average speed' },
-    { key: 'lineChoice', label: 'Line choice' },
-    { key: 'transitionSmoothness', label: 'Turn / transition smoothness' },
-  ],
 }
 
 function getSportLabel(sport: SportKey): string {
@@ -66,8 +35,42 @@ function MetricSelection({
   onBack,
   theme,
 }: MetricSelectionProps) {
-  const metrics = METRICS_BY_SPORT[sport]
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [metrics, setMetrics] = useState<{ key: string; label: string }[]>([])
   const isDark = theme === 'dark'
+
+  const loadMetrics = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getMatricesBySport(sport)
+      let doc: MatrixDoc | null = null
+      if (data == null) {
+        doc = null
+      } else if (Array.isArray(data)) {
+        doc = data.find((d) => d.sport === sport) ?? data[0] ?? null
+      } else {
+        doc = data as MatrixDoc
+      }
+      const entries = doc?.matrix ? Object.entries(doc.matrix) : []
+      setMetrics(
+        entries.map(([key, desc]) => ({
+          key,
+          label: desc?.trim() || key,
+        })),
+      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load metrics')
+      setMetrics([])
+    } finally {
+      setLoading(false)
+    }
+  }, [sport])
+
+  useEffect(() => {
+    loadMetrics()
+  }, [loadMetrics])
 
   return (
     <div className="app-page metric-selection-page bg-white py-10">
@@ -96,7 +99,21 @@ function MetricSelection({
           </p>
         </header>
         <div className="metric-selection-grid">
-            {metrics.map((metric) => (
+          {loading ? (
+            <div className="app-page-loader">
+              <Loader2 size={32} strokeWidth={2} className="app-page-loader-icon" aria-hidden />
+              <span className="app-page-loader-text">Loading metrics…</span>
+            </div>
+          ) : error ? (
+            <div className="rounded-xl border border-red-200/50 bg-red-50/30 px-4 py-6 text-center text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400">
+              {error}
+            </div>
+          ) : metrics.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 px-4 py-12 text-center text-slate-500 dark:border-slate-600 dark:text-slate-400">
+              No metrics configured for this sport. Add metrics in Metrics Configuration.
+            </div>
+          ) : (
+            metrics.map((metric) => (
               <button
                 key={metric.key}
                 type="button"
@@ -146,7 +163,8 @@ function MetricSelection({
                   </div>
                 </div>
               </button>
-            ))}
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -11,6 +11,8 @@ import {
   HistoryPageWithContext,
 } from './components/DashboardLayout'
 import DashboardHome from './components/DashboardHome'
+import MetricsConfiguration from './features/metrics/components/MetricsConfiguration'
+import ChatPage from './features/chat/components/ChatPage'
 
 function AppRoutes() {
   const location = useLocation()
@@ -116,6 +118,8 @@ function AppRoutes() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardHome />} />
             <Route path="history" element={<HistoryPageWithContext />} />
+            <Route path="metrics-configuration" element={<MetricsConfiguration />} />
+            <Route path="chat" element={<ChatPage />} />
           </Route>
         </Routes>
       </main>

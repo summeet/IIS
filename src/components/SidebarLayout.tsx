@@ -20,7 +20,15 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false, onHomeClick, 
             }
             onClick={onHomeClick}
           >
-            Home
+            Video Analysis
+          </NavLink>
+          <NavLink
+            to="/metrics-configuration"
+            className={({ isActive }) =>
+              `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
+            }
+          >
+            Metrics Configuration
           </NavLink>
           <NavLink
             to="/history"
@@ -30,6 +38,15 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false, onHomeClick, 
             onClick={onHistoryClick}
           >
             History
+          </NavLink>
+          <NavLink
+            to="/chat"
+            className={({ isActive }) =>
+              `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
+            }
+            onClick={onHistoryClick}
+          >
+            Chat
           </NavLink>
         </nav>
         {onLogout && (
