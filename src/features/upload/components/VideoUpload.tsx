@@ -4,7 +4,18 @@ import { useToast } from '../../../contexts/ToastContext'
 import type { UploadVideoResponse } from '../types'
 import { uploadVideo } from '../api'
 
-const DEFAULT_PERSON_OPTIONS = ['Person 1', 'Person 2', 'Person 3']
+const DEFAULT_PERSON_OPTIONS = [
+  'Alex Johnson',
+  'Jordan Smith',
+  'Samantha Lee',
+  'Riley Martinez',
+  'Morgan Patel',
+  'Casey Nguyen',
+  'Taylor Brown',
+  'Jamie Wilson',
+  'Quinn Anderson',
+  'Reese Thompson',
+]
 
 type VideoUploadProps = {
   onAnalyzed: (result: UploadVideoResponse, file: File) => void
@@ -75,13 +86,15 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAU
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setDropdownOpen(false)
       }
     }
     if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
+      // Use capture so we run before any child stopPropagation
+      document.addEventListener('mousedown', handleClickOutside, true)
+      return () => document.removeEventListener('mousedown', handleClickOutside, true)
     }
   }, [dropdownOpen])
 
