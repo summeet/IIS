@@ -25,7 +25,7 @@ export default function DashboardHome() {
     return (
       <VideoUpload
         onAnalyzed={handleAnalyzed}
-        onBack={() => setMetricKey(null)}
+        onBack={() => setSport(null)}
         sport={sport ?? undefined}
         metricKey={metricKey ?? undefined}
       />

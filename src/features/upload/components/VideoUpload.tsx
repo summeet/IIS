@@ -314,8 +314,6 @@ function VideoUpload({ onAnalyzed, onBack, sport, metricKey, personNames = DEFAU
                   />
                   Uploading…
                 </>
-              ) : personName ? (
-                `Upload & generate for ${personName}`
               ) : (
                 'Upload & generate'
               )}
