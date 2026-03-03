@@ -78,9 +78,6 @@ const ChatPage = () => {
         content?: string
       }>('/chatbot/chat', {
         message: text,
-        model: 'llama-3.3-70b-versatile',
-        api_key: import.meta.env.VITE_CHAT_API_KEY,
-        google_api_key: import.meta.env.VITE_GOOGLE_API_KEY,
         session_id: sessionIdRef.current,
       })
 
