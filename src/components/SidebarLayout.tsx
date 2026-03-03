@@ -13,6 +13,14 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false, onHomeClick, 
     <div className="dashboard-layout">
       <aside className="dashboard-sidebar">
         <nav className="dashboard-sidebar-nav">
+        <NavLink
+            to="/metrics-configuration"
+            className={({ isActive }) =>
+              `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
+            }
+          >
+            Metrics Configuration
+          </NavLink>
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -22,14 +30,7 @@ function SidebarLayout({ children, onLogout, isLoggingOut = false, onHomeClick, 
           >
             Video Analysis
           </NavLink>
-          <NavLink
-            to="/metrics-configuration"
-            className={({ isActive }) =>
-              `dashboard-nav-item${isActive ? ' dashboard-nav-item--active' : ''}`
-            }
-          >
-            Metrics Configuration
-          </NavLink>
+          
           <NavLink
             to="/history"
             className={({ isActive }) =>
