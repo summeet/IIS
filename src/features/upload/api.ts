@@ -7,9 +7,6 @@ const UPLOAD_VIDEO_ENDPOINT = '/video/upload'
 /** FormData field name for the video file – use 'file' or 'video' per backend */
 const UPLOAD_VIDEO_FILE_FIELD = 'video'
 
-/** FormData key for the selected person name; value = person name string */
-const UPLOAD_PERSON_NAME_KEY = 'person_name'
-
 /** API may return response/performance as array [{ fighter_A }, { fighter_B }]; normalize to object */
 export function normalizeFighterPair(
   value: unknown,
