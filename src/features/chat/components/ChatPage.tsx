@@ -24,7 +24,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, isSending])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -128,22 +128,35 @@ const ChatPage = () => {
                 <p className="chat-messages-empty-hint">Type below and press Enter or Send.</p>
               </div>
             ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`chat-message chat-message--${msg.role}`}
-                >
-                  <div className="chat-message-bubble">
-                    <p className="chat-message-text">{msg.content}</p>
-                    <span className="chat-message-time">
-                      {msg.timestamp.toLocaleTimeString(undefined, {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+              <>
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`chat-message chat-message--${msg.role}`}
+                  >
+                    <div className="chat-message-bubble">
+                      <p className="chat-message-text">{msg.content}</p>
+                      <span className="chat-message-time">
+                        {msg.timestamp.toLocaleTimeString(undefined, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))}
+                {isSending && (
+                  <div className="chat-message chat-message--assistant">
+                    <div className="chat-message-bubble chat-thinking-bubble">
+                      <span className="chat-typing-dots" aria-hidden>
+                        <span className="chat-typing-dot" />
+                        <span className="chat-typing-dot" />
+                        <span className="chat-typing-dot" />
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <div ref={messagesEndRef} />
           </div>
