@@ -1,6 +1,5 @@
 import { useDashboard } from '../contexts/DashboardContext'
 import SportSelection from '../features/sports/components/SportSelection'
-import MetricSelection from '../features/metrics/components/MetricSelection'
 import VideoUpload from '../features/upload/components/VideoUpload'
 import MetricsView from '../features/metrics/components/MetricsView'
 
@@ -17,21 +16,10 @@ export default function DashboardHome() {
     selectedFile,
     setSelectedFile,
     handleAnalyzed,
-    theme,
   } = useDashboard()
 
   if (sport === null) {
     return <SportSelection onSelect={setSport} />
-  }
-  if (metricKey === null) {
-    return (
-      <MetricSelection
-        sport={sport}
-        onSelectMetric={setMetricKey}
-        onBack={() => setSport(null)}
-        theme={theme}
-      />
-    )
   }
   if (view === 'upload') {
     return (
