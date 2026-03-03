@@ -176,7 +176,10 @@ function MetricsConfiguration() {
             <button
               type="button"
               className="metric-selection-back-link"
-              onClick={() => setSport(null)}
+              onClick={() => {
+                cancelEdit()
+                setSport(null)
+              }}
             >
               <ArrowLeft size={18} strokeWidth={2} aria-hidden />
               <span>Back</span>
