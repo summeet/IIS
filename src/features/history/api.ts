@@ -1,6 +1,6 @@
 import apiClient from '../../api/client'
 import type { FighterData, UploadResult } from '../upload/types'
-import { normalizeFighterPair } from '../upload/api'
+import { normalizePerformance } from '../upload/api'
 
 /** Single report from GET /dash/user-id – performance may be array or object */
 export type UserHistoryReport = {
@@ -36,28 +36,28 @@ export async function deleteReports(reportIds: string[]): Promise<void> {
   await apiClient.delete('reports', { data: reportIds as unknown as string[] })
 }
 
-const emptyFighter: FighterData = {}
-
-/** Map API report to UploadResult for History/MetricsView; normalizes performance if array */
+/** Map API report to UploadResult for History/MetricsView; normalizes player_A/B and timestamp */
 export function mapHistoryReportToUploadResult(report: UserHistoryReport): UploadResult {
   const dateLabel = formatReportDate(report?.created_at ?? '')
   const sport = report?.sport ?? 'Session'
   const fileName = report?.name
     ? `${report.name} – ${sport} – ${dateLabel}`
     : `${sport} – ${dateLabel}`
-  const pair = normalizeFighterPair(report?.performance)
-  const fighter_A = pair.fighter_A ?? emptyFighter
-  const fighter_B = pair.fighter_B ?? emptyFighter
+  const perf = normalizePerformance(report?.performance)
   return {
     message: '',
     user_id: report?.user_id ?? '',
-    response: { fighter_A, fighter_B },
+    response: { fighter_A: perf.fighter_A, fighter_B: perf.fighter_B },
     report: {
       _id: report?._id ?? '',
       user_id: report?.user_id ?? '',
       sport: report?.sport ?? '',
       name: report?.name,
-      performance: { fighter_A, fighter_B },
+      performance: {
+        fighter_A: perf.fighter_A,
+        fighter_B: perf.fighter_B,
+        timestamp: perf.timestamp,
+      },
       created_at: report?.created_at ?? '',
       updated_at: report?.updated_at ?? '',
     },

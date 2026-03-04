@@ -18,10 +18,17 @@ export type FighterCorner = {
   confidence_score?: number | null
 }
 
-/** Fighter/participant data – keys are dynamic from API (e.g. total_punches, custom metrics) */
+/** Fighter/participant data – keys are dynamic from API (e.g. Punches, identification) */
 export type FighterData = {
   corner?: FighterCorner | null
   [key: string]: unknown
+}
+
+/** Timestamp arrays from report.performance (e.g. player_A_punches, player_B_punches) */
+export type PerformanceTimestamp = {
+  player_A_punches?: string[]
+  player_B_punches?: string[]
+  [key: string]: string[] | undefined
 }
 
 export type UploadVideoResponse = {
@@ -36,7 +43,11 @@ export type UploadVideoResponse = {
     user_id: string
     sport: string
     name?: string
-    performance: Record<string, FighterData>
+    performance: {
+      fighter_A: FighterData
+      fighter_B: FighterData
+      timestamp?: PerformanceTimestamp
+    }
     created_at: string
     updated_at: string
   }

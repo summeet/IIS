@@ -122,9 +122,9 @@ export function DashboardProvider({
       .finally(() => setHistoryLoading(false))
   }, [])
 
-  useEffect(() => {
-    loadHistory()
-  }, [loadHistory])
+  // useEffect(() => {
+  //   loadHistory()
+  // }, [])
 
   // Refetch history when user opens the History page (e.g. token was not ready on first load)
   useEffect(() => {

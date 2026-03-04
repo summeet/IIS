@@ -2612,6 +2612,121 @@
   margin-bottom: 1.5rem;
 }
 
+.metrics-timestamps {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.metrics-timestamps-desc {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.theme-light .metrics-timestamps-desc,
+.metrics-view-page.bg-white .metrics-timestamps-desc {
+  color: #64748b;
+}
+
+.metrics-timestamp-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.6rem;
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.25rem;
+}
+
+.metrics-timestamp-buttons-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.metrics-timestamp-buttons-grid::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+
+.metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 4px;
+}
+
+.metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+.theme-light .metrics-timestamp-buttons-grid::-webkit-scrollbar-track,
+.metrics-view-page.bg-white .metrics-timestamp-buttons-grid::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+.theme-light .metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb,
+.metrics-view-page.bg-white .metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+}
+
+.theme-light .metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb:hover,
+.metrics-view-page.bg-white .metrics-timestamp-buttons-grid::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.metrics-timestamp-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.12);
+  color: #7dd3fc;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+  text-align: left;
+}
+
+.metrics-timestamp-btn-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(248, 250, 252, 0.9);
+  line-height: 1.2;
+}
+
+.metrics-timestamp-btn-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.theme-light .metrics-timestamp-btn-label,
+.metrics-view-page.bg-white .metrics-timestamp-btn-label {
+  color: #334155;
+}
+
+.metrics-timestamp-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
+}
+
+.theme-light .metrics-timestamp-btn,
+.metrics-view-page.bg-white .metrics-timestamp-btn {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.1);
+  color: #0369a1;
+}
+
+.theme-light .metrics-timestamp-btn:hover,
+.metrics-view-page.bg-white .metrics-timestamp-btn:hover {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: #0284c7;
+}
+
 .fighter-card {
   padding: 1.25rem;
   border-radius: 0.75rem;
