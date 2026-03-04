@@ -49,6 +49,7 @@ function HistoryPage({ history, historyLoading = false, viewingReport, onSelectR
         metrics={viewingReport}
         file={null}
         onBackToList={onBackToList}
+        showTimestamp={false}
       />
     )
   }

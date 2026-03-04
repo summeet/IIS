@@ -9,6 +9,7 @@ type MetricsViewProps = {
   onUploadAnother?: () => void
   onStartAgain?: () => void
   onBackToList?: () => void
+  showTimestamp?: boolean
 }
 
 function fmt(value: string | number | null | undefined, suffix = ''): string {
@@ -96,6 +97,7 @@ function MetricsView({
   onUploadAnother,
   onStartAgain,
   onBackToList,
+  showTimestamp = true,
 }: MetricsViewProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -188,7 +190,7 @@ function MetricsView({
                 No analysis data available for this report.
               </p>
             )}
-            {timestampData && Object.keys(timestampData).length > 0 ? (
+            {showTimestamp && timestampData && Object.keys(timestampData).length > 0 ? (
               <div className="metrics-timestamps">
                 <h3 className="metrics-section-title">Timestamp</h3>
                 <p className="metrics-timestamps-desc">Click a time to seek the video and play from that moment.</p>
